@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniLost — Бюро находок университета</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+
+    <!-- Навигационная панель -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/"><i class="fa-solid fa-compass text-warning me-2"></i>UniLost</a>
+            <a href="/add" class="btn btn-warning fw-semibold text-dark"><i class="fa-solid fa-plus me-1"></i> Подать объявление</a>
+        </div>
+    </nav>
+
+    <!-- Главный блок (Hero) -->
+    <header class="bg-primary text-white py-5 mb-4 shadow">
+        <div class="container text-center">
+            <h1 class="display-5 fw-bold">Потеряли или нашли вещь в университете?</h1>
+            <p class="lead text-white-50">Быстрый поиск потерянных студенческих билетов, гаджетов и вещей.</p>
+            
+            <!-- Форма поиска -->
+            <form action="/" method="GET" class="row g-2 justify-content-center mt-4">
+                <div class="col-md-5">
+                    <input type="text" name="search" class="form-control form-control-lg" placeholder="Что вы ищете? (например, студенческий)" value="{{ search }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="category" class="form-select form-control-lg" style="height: 48px;">
+                        <option value="Все">Все категории</option>
+                        <option value="Документы" {% if selected_category == 'Документы' %}selected{% endif %}>Документы</option>
+                        <option value="Электроника" {% if selected_category == 'Электроника' %}selected{% endif %}>Электроника</option>
+                        <option value="Ключи" {% if selected_category == 'Ключи' %}selected{% endif %}>Ключи</option>
+                        <option value="Одежда" {% if selected_category == 'Одежда' %}selected{% endif %}>Одежда</option>
+                        <option value="Другое" {% if selected_category == 'Другое' %}selected{% endif %}>Другое</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold text-dark">Найти</button>
+                </div>
+            </form>
+        </div>
+    </header>
+
+    <!-- Список объявлений -->
+    <main class="container mb-5">
+        <h3 class="mb-4 text-secondary border-bottom pb-2">Актуальные объявления</h3>
+        
+        {% if items %}
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for item in items %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge {% if item[5] == 'Потеряно' %}bg-danger{% else %}bg-success{% endif %}">
+                                    {{ item[5] }}
+                                </span>
+                                <span class="text-muted small"><i class="fa-solid fa-tag me-1"></i>{{ item[2] }}</span>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark">{{ item[1] }}</h5>
+                            <p class="card-text text-muted">{{ item[3] }}</p>
+                        </div>
+                        <div class="card-footer bg-white border-0 pb-3">
+                            <div class="d-flex align-items-center text-primary small fw-semibold">
+                                <i class="fa-solid fa-phone-flip me-2"></i> Контакт: {{ item[4] }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fa-solid fa-folder-open fa-3x text-muted mb-3"></i>
+                <p class="text-muted fs-5">Пока нет ни одного объявления. Будьте первыми!</p>
+            </div>
+        {% endif %}
+    </main>
+
+    <!-- Футер -->
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <div class="container small text-white-50">
+            UniLost &copy; 2026 — Университетский сервис поиска вещей
+        </div>
+    </footer>
+
+</body>
+</html>

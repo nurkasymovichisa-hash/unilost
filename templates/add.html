@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить объявление — UniLost</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <div class="container mt-5" style="max-width: 600px;">
+        <div class="card shadow border-0 p-4">
+            <h2 class="mb-4 text-center fw-bold text-primary">Новое объявление</h2>
+            
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Что произошло?</label>
+                    <select name="status" class="form-select" required>
+                        <option value="Потеряно">Я потерял вещь</option>
+                        <option value="Найдено">Я нашел вещь</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Название вещи</label>
+                    <input type="text" name="title" class="form-control" placeholder="Например: Студенческий билет на имя Иса" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Категория</label>
+                    <select name="category" class="form-select" required>
+                        <option value="Документы">Документы</option>
+                        <option value="Электроника">Электроника</option>
+                        <option value="Ключи">Ключи</option>
+                        <option value="Одежда">Одежда</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Описание (где и при каких обстоятельствах)</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Опишите детали..." required></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Контакты для связи (Телефон / Telegram)</label>
+                    <input type="text" name="contact" class="form-control" placeholder="+996 ... или @username" required>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="/" class="btn btn-secondary">Назад</a>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold">Опубликовать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
