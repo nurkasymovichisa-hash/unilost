@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель управления — Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>🛠️ Панель администратора UniLost</h2>
+            <div>
+                <a href="/" class="btn btn-outline-secondary me-2">На сайт</a>
+                <a href="/logout" class="btn btn-danger">Выйти</a>
+            </div>
+        </div>
+
+        <div class="card shadow border-0 p-3">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Статус</th>
+                        <th>Корпус</th>
+                        <th>Контакты</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item[0] }}</td>
+                        <td class="fw-bold">{{ item[1] }}</td>
+                        <td><span class="badge {% if item[7] == 'Потеряно' %}bg-danger{% else %}bg-success{% endif %}">{{ item[7] }}</span></td>
+                        <td>{{ item[3] }}</td>
+                        <td>{{ item[5] }} {% if item[6] %}/ @{{ item[6] }}{% endif %}</td>
+                        <td>
+                            <form action="/admin/delete/{{ item[0] }}" method="POST" onsubmit="return confirm('Удалить объявление?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
