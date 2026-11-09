@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t.title }}</title>
+    
+    <!-- PWA манифест и иконки -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#2563eb">
+    
+    <!-- Иконки для мобильных устройств (чтобы телефон гарантированно видел картинку) -->
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icon.png') }}">
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/sw.js');
+      }
+    </script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .navbar-custom { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); }
+        .hero-section { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: white; padding: 60px 0 50px 0; }
+        .card-item { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; transition: all 0.3s; }
+        .card-item:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.08); }
+        .comment-box { background: #f1f5f9; border-radius: 10px; padding: 8px 12px; margin-bottom: 6px; font-size: 13px; }
+        .ai-chat-btn { background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); border: none; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-4 d-flex align-items-center gap-2" href="/">
+                <span class="bg-primary text-white p-1 rounded-3 fs-6">🔍</span> UniLost
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <div class="btn-group btn-group-sm bg-dark p-1 rounded-pill">
+                    <a href="/set_lang/ky" class="btn rounded-pill px-3 {% if current_lang == 'ky' %}btn-primary text-white{% else %}btn-dark text-muted{% endif %}">KG</a>
+                    <a href="/set_lang/ru" class="btn rounded-pill px-3 {% if current_lang == 'ru' %}btn-primary text-white{% else %}btn-dark text-muted{% endif %}">RU</a>
+                </div>
+                <a href="/add" class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold">{{ t.add_item }}</a>
+                <a href="/admin" class="btn btn-outline-light btn-sm rounded-pill px-3 opacity-75">{{ t.admin_login }}</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero-section text-center">
+        <div class="container" style="max-width: 700px;">
+            <h1 class="fw-extrabold display-5 mb-2">{{ t.title }}</h1>
+            <p class="text-secondary opacity-75 mb-4">{{ t.subtitle }}</p>
+
+            <form method="GET" action="/" class="d-flex gap-2">
+                <input type="text" name="search" class="form-control form-control-lg rounded-pill px-4" placeholder="{{ t.search_placeholder }}" value="{{ search }}">
+                <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="bi bi-search"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <div class="row g-4">
+            {% for item_obj in items %}
+            {% set item = item_obj.data %}
+            {% set comments = item_obj.comments %}
+            <div class="col-md-4">
+                <div class="card card-item h-100 overflow-hidden d-flex flex-column justify-content-between">
+                    <div>
+                        {% if item[8] %}
+                            <img src="{{ url_for('static', filename='uploads/' + item[8]) }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="bi bi-image text-muted fs-1 opacity-50"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge rounded-pill px-3 py-1 fw-medium {% if 'Табылды' in item[7] or 'Найдено' in item[7] %}bg-success text-white{% else %}bg-danger text-white{% endif %}">
+                                    {{ item[7] }}
+                                </span>
+                                <small class="text-muted"><i class="bi bi-geo-alt text-primary"></i> {{ item[3] }}</small>
+                            </div>
+
+                            <h5 class="fw-bold text-dark mb-1">{{ item[1] }}</h5>
+                            <p class="text-secondary small mb-3">{{ item[4] }}</p>
+
+                            <!-- Кнопки быстрой связи -->
+                            <div class="d-flex gap-2 mb-3">
+                                {% if item[6] %}
+                                    <a href="https://t.me/{{ item[6] }}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill w-100">
+                                        <i class="bi bi-telegram"></i> Telegram
+                                    </a>
+                                {% endif %}
+                                {% if item[5] %}
+                                    <a href="https://wa.me/{{ item[5]|replace('+', '')|replace(' ', '') }}?text=Привет!%20Я%20по%20поводу%20объявления%20на%20UniLost:%20{{ item[1] }}" target="_blank" class="btn btn-outline-success btn-sm rounded-pill w-100">
+                                        <i class="bi bi-whatsapp"></i> WhatsApp
+                                    </a>
+                                {% endif %}
+                            </div>
+
+                            <!-- Секция комментариев -->
+                            <div class="border-top pt-3">
+                                <h6 class="fw-bold fs-7 text-muted mb-2"><i class="bi bi-chat-left-text"></i> {{ t.comments }} ({{ comments|length }})</h6>
+                                <div style="max-height: 120px; overflow-y: auto;">
+                                    {% for c in comments %}
+                                        <div class="comment-box">
+                                            <b>{{ c[0] }}:</b> {{ c[1] }}
+                                        </div>
+                                    {% else %}
+                                        <small class="text-muted d-block mb-2">Комментариев пока нет</small>
+                                    {% endfor %}
+                                </div>
+
+                                <form method="POST" action="/comment/{{ item[0] }}" class="mt-2">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" name="text" class="form-control rounded-start-pill" placeholder="{{ t.write_comment }}" required>
+                                        <button class="btn btn-secondary rounded-end-pill" type="submit">{{ t.send }}</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Футер карточки -->
+                    <div class="card-footer bg-white border-top p-3 d-flex justify-content-between align-items-center">
+                        <form method="POST" action="/like/{{ item[0] }}" class="d-inline">
+                            <button type="submit" class="btn btn-light btn-sm rounded-pill text-danger border">
+                                ❤️ {{ item[9] }}
+                            </button>
+                        </form>
+
+                        <form method="POST" action="/report/{{ item[0] }}" class="d-inline">
+                            <button type="submit" class="btn btn-link btn-sm text-muted text-decoration-none" title="Жалоба">
+                                ⚠️ <small>{{ t.report }}</small>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ИИ-Ассистент -->
+    <div style="position: fixed; bottom: 25px; right: 25px; z-index: 1000;">
+        <button onclick="toggleAiChat()" class="btn ai-chat-btn rounded-circle shadow-lg text-white" style="width: 60px; height: 60px; font-size: 24px;">
+            🤖
+        </button>
+    </div>
+
+    <div id="aiChatWindow" class="card shadow-lg border-0" style="position: fixed; bottom: 100px; right: 25px; width: 320px; display: none; z-index: 1000; border-radius: 18px; overflow: hidden;">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3 px-3">
+            <span class="fw-bold">🤖 UniLost AI Ассистент</span>
+            <button onclick="toggleAiChat()" class="btn-close btn-close-white btn-sm"></button>
+        </div>
+        <div class="card-body bg-light" id="aiChatBody" style="height: 220px; overflow-y: auto; font-size: 13px;">
+            <p class="text-secondary bg-white p-2 rounded-3 shadow-sm mb-2">Саламатсызбы! Мен UniLost ИИ жардамчысымын. Сизге кантип жардам берейин?</p>
+        </div>
+        <div class="card-footer bg-white p-2 border-top">
+            <div class="input-group">
+                <input type="text" id="aiInput" class="form-control form-control-sm rounded-pill px-3" placeholder="Жазыңыз...">
+                <button onclick="sendAiMessage()" class="btn btn-primary btn-sm rounded-pill px-3 ms-1">Жөнөтүү</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function toggleAiChat() {
+        let win = document.getElementById('aiChatWindow');
+        win.style.display = win.style.display === 'none' ? 'block' : 'none';
+    }
+    function sendAiMessage() {
+        let input = document.getElementById('aiInput');
+        let body = document.getElementById('aiChatBody');
+        if (!input.value.trim()) return;
+
+        let userText = input.value;
+        body.innerHTML += `<div class="text-end mb-2"><span class="bg-primary text-white p-2 rounded-3 d-inline-block">${userText}</span></div>`;
+        input.value = '';
+
+        setTimeout(() => {
+            let reply = "Бул боюнча башкы корпустагы деканатка кайрылыңыз!";
+            let text = userText.toLowerCase();
+            if (text.includes('студент') || text.includes('билет')) {
+                reply = "Студенттик билеттер көбүнчө китепканада же ашканада калат!";
+            }
+            body.innerHTML += `<div class="text-start mb-2"><span class="bg-white text-dark p-2 rounded-3 shadow-sm d-inline-block"><b>AI:</b> ${reply}</span></div>`;
+            body.scrollTop = body.scrollHeight;
+        }, 400);
+    }
+    </script>
+
+    <footer class="text-center py-4 text-muted bg-white border-top mt-5">
+        <small>{{ t.footer }}</small>
+    </footer>
+
+</body>
+</html>
